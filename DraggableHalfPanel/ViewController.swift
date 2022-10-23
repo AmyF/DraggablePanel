@@ -8,8 +8,8 @@
 import UIKit
 
 class ViewController: DraggablePanelViewController {
-    private let rootVC = UIViewController()
-    override var rootViewController: UIViewController {
+    private let rootVC = RootVC()
+    override var rootViewController: DraggableRootViewController {
         rootVC
     }
     
@@ -24,8 +24,43 @@ class ViewController: DraggablePanelViewController {
     }
 }
 
+class RootVC: UIViewController, DraggableRootViewController, UITableViewDataSource {
+    var scrollView: UIScrollView? {
+        tableView
+    }
+    
+    let tableView: UITableView = UITableView(frame: .zero, style: .plain)
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.dataSource = self
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        [
+            tableView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
+        ].forEach {
+            $0.isActive = true
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        100
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.textLabel?.text = "\(indexPath)"
+        return cell
+    }
+}
+
 class BottomViewController: UIViewController, DraggableViewController {
-    var dragHeight: DragHeight = .default
+    var dragHeight: DraggablePanelViewController.DragHeight = .default
     
     var draggableView: UIView = UIView()
     
